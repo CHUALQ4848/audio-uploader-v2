@@ -1,0 +1,44 @@
+// Prisma schema for audio hosting application
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  audioFiles AudioFile[]
+  
+  @@map("users")
+}
+
+model AudioFile {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  category    String
+  s3Key       String   @unique
+  s3Url       String
+  duration    Float?
+  fileName    String?
+  fileSize    Int
+  mimeType    String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([category])
+  @@map("audio_files")
+}
